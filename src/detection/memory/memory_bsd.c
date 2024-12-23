@@ -18,7 +18,10 @@ const char* ffDetectMemory(FFMemoryResult* ram)
         + ffSysctlGetInt("vm.stats.vm.v_inactive_count", 0)
         + ffSysctlGetInt("vm.stats.vm.v_cache_count", 0);
 
-    ram->bytesUsed = ram->bytesTotal - (uint64_t) pagesFree * instance.state.platform.sysinfo.pageSize;
+    // Ignore ZFS ARC Cache
+    int32_t ZFSArcUsage = ffSysctlGetInt("kstat.zfs.misc.arcstats.size", 0)
+
+    ram->bytesUsed = ram->bytesTotal- ZFSArcUsage - (uint64_t) pagesFree * instance.state.platform.sysinfo.pageSize;
 
     return NULL;
 }
